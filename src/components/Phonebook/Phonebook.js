@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import s from './Phonebook.module.css';
-import PropTypes from 'prop-types';
 import { addContact } from '../../redux/contacts/contacts-actions';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { getContacts } from '../../redux/contacts/contacts-selectors';
 
-function Phonebook({ contacts, addContact }) {
+function Phonebook() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
 
   const handleInput = evt => {
     switch (evt.currentTarget.name) {
@@ -39,7 +42,7 @@ function Phonebook({ contacts, addContact }) {
 
     isNameInContacts
       ? alert(`${name} is already in contacts`)
-      : addContact(name, number);
+      : dispatch(addContact(name, number));
   };
 
   return (
@@ -79,25 +82,4 @@ function Phonebook({ contacts, addContact }) {
   );
 }
 
-Phonebook.propTypes = {
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ),
-  addContact: PropTypes.func.isRequired,
-};
-
-const mapStateToProps = state => {
-  return { contacts: state.contacts.items };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    addContact: (name, number) => dispatch(addContact(name, number)),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Phonebook);
+export default Phonebook;
