@@ -1,7 +1,7 @@
-import { nanoid } from 'nanoid';
-import { ADD_CONTACTS, DELETE_CONTACTS, SET_FILTER } from './contacts-types';
 import GetContactsFromStorage from 'components/GetContactsFromStorage';
 import { combineReducers } from 'redux';
+import { createReducer } from '@reduxjs/toolkit';
+import { addContact, deleteContact, setFilter } from './contacts-actions';
 
 const data = [
   { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
@@ -10,27 +10,53 @@ const data = [
   { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
 ];
 
-const initialContactsItems = GetContactsFromStorage(data);
+// const initialContactsItems = GetContactsFromStorage(data);
 
-const itemReducer = (state = initialContactsItems, { type, payload }) => {
-  switch (type) {
-    case ADD_CONTACTS:
-      return [...state, { ...payload, id: nanoid() }];
-    case DELETE_CONTACTS:
-      return [...state.filter(contact => contact.id !== payload)];
-    default:
-      return state;
-  }
-};
+const itemReducer = createReducer(data, {
+  [addContact]: (state, { payload }) => {
+    const newStateAfterAdd = [...state, { ...payload }];
+    // localStorage.setItem('contacts', JSON.stringify(newStateAfterAdd));
+    return newStateAfterAdd;
+  },
 
-const filterReducer = (state = '', { type, payload }) => {
-  switch (type) {
-    case SET_FILTER:
-      return payload;
-    default:
-      return state;
-  }
-};
+  [deleteContact]: (state, { payload }) => {
+    const newStateAfterDelete = [
+      ...state.filter(contact => contact.id !== payload),
+    ];
+    // localStorage.setItem('contacts', JSON.stringify(newStateAfterDelete));
+    return newStateAfterDelete;
+  },
+});
+
+// const itemReducer = (state = initialContactsItems, { type, payload }) => {
+//   switch (type) {
+//     case ADD_CONTACTS:
+//       const newStateAfterAdd = [...state, { ...payload }];
+//       localStorage.setItem('contacts', JSON.stringify(newStateAfterAdd));
+//       return newStateAfterAdd;
+//     case DELETE_CONTACTS:
+// const newStateAfterDelete = [
+//   ...state.filter(contact => contact.id !== payload),
+// ];
+// localStorage.setItem('contacts', JSON.stringify(newStateAfterDelete));
+// return newStateAfterDelete;
+//     default:
+//       return state;
+//   }
+// };
+
+const filterReducer = createReducer('', {
+  [setFilter]: (_, { payload }) => payload,
+});
+
+// const filterReducer = (state = '', { type, payload }) => {
+//   switch (type) {
+//     case SET_FILTER:
+//       return payload;
+//     default:
+//       return state;
+//   }
+// };
 
 export const contactsReduser = combineReducers({
   items: itemReducer,
